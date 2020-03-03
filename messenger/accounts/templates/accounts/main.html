@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}Main{% endblock title %}</title>
+    <style>
+        main {
+            width: 40%;
+        }
+
+        input {
+            display: block;
+            padding: 10px;
+            margin: 5px;
+            width: 100%;
+        }
+
+        button {
+            display: block;
+            padding: 10px;
+            margin: 5px;
+            width: 100%;
+        }
+
+        a {
+            padding: 5px;
+        }
+
+        div {
+            display: flex;
+            background-color: black;
+        }
+
+        div a {
+            color: white;
+            border: white solid 1px;
+            text-decoration: none;
+        }
+
+        .root {
+            background-color: black;
+        }
+
+        .user {
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <a class="root" href="{% url 'accounts:main' %}">main</a>
+    <a class="user" href="{% url 'accounts:logout' %}">logout</a>
+    <a class="user" href="{% url 'accounts:login' %}">login</a>
+    <a class="root" href="{% url 'accounts:register' %}">register</a>
+    <a class="user" href="{% url 'accounts:settings' %}">settings</a>
+    <a class="root" href="{% url 'accounts:user_management' %}">user_management</a>
+    <a class="user" href="{% url 'accounts:personal_settings' %}">personal_settings</a>
+</div>
+<main>
+
+    <br>
+    <br>
+    {% block body %}
+    current_user = {{ current_user }}<br>
+    first_name = {{ current_user.first_name }}<br>
+    last_name email = {{ current_user.last_name }}<br>
+    password = {{ current_user.password }}<br>
+    groups = {{ current_user.groups }}<br>
+    user_permissions = {{ current_user.user_permissions }}<br>
+    is_staff = {{ current_user.is_staff }}<br>
+    is_active = {{ current_user.is_active }}<br>
+    is_superuser = {{ current_user.is_superuser }}<br>
+    last_login = {{ current_user.last_login }}<br>
+    date_joined = {{ current_user.date_joined }}<br>
+    <hr>
+    {% for user in all_users %}
+    user = {{ user }}<br>
+    {% endfor %}
+    {% endblock body %}
+
+</main>
+</body>
+</html>

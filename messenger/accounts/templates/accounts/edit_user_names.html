@@ -1,0 +1,32 @@
+{% extends 'pwaMessenger/main.html' %}
+{% block title %}{{page_title}}{% endblock title %}
+{% block main %}
+
+<div class="col-12 p-3">
+    <form method='POST' action="{% url 'accounts:edit_user_names' %}">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="col-md-4 mb-3 md-form">
+                <label for="loginInput" class="text-white">Имя</label>
+               {{ form.first_name }}
+                <div class="valid-feedback">
+                    Подходит
+                </div>
+            </div>
+            <div class="col-md-4 mb-3 md-form">
+                <label for="passwordInput" class="text-white">Фамилия</label>
+                {{ form.last_name }}
+                <div class="valid-feedback">
+                    Подходит
+                </div>
+            </div>
+
+        </div>
+        <div class="from-row mt-4">
+            <button class="btn btn-default btn-block btn-sm" type="submit">Сохранить</button>
+        </div>
+    </form>
+</div>
+
+
+{% endblock main %}

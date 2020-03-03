@@ -1,0 +1,136 @@
+sudo apt-get update
+sudo apt-get install -y vim mosh tmux htop git curl wget unzip zip gcc build-essential make zsh nginx supervisor redis-server
+
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+Ssh
+====
+sudo vim /etc/ssh/sshd_config
+    AllowUsers misha root
+    PermitRootLogin yes
+    PasswordAuthentication yes
+
+sudo service ssh restart
+
+Cloning project
+====
+mkdir code; cd code
+git clone https://github.com/100pecheneK/Messenger.git
+
+wget https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz
+tar xvf Python-3.7.*
+cd Python-3.7.3
+mkdir ~/.python
+./configure --enable-optimizations --prefix=/home/www/.python
+make -j8
+sudo make altinstall
+
+/home/misha/.python/bin/python3.7 -m pip install -U pip
+
+apt-get install python3-venv
+python3.7 -m venv env
+
+
+Project settings
+============
+In asgi.py
+----
+import os
+import django
+from channels.routing import get_default_application
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "messenger.settings")
+django.setup()
+application = get_default_application()
+----
+In settings.py
+----
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('0.0.0.0', 6379)],
+        },
+    },
+}
+----
+pip install -U channels_redis
+----
+Даём права www-data на директорию и бд(не надо)
+====
+chown www-data:www-data ./messenger;
+chown www-data:www-data ./messenger/db.sqlite3
+
+НАстройки redis
+====
+redis-cli
+config set stop-writes-on-bgsave-error no
+
+
+daphne -b 0.0.0.0 -p 8001 messenger.asgi:application 
+
+Create start_daphne.sh
+chmod +x bin/start_daphne.sh 
+In start_daphne.sh
+====
+#!/bin/bash
+source /home/misha/code/env/bin/activate
+cd /home/misha/code/Messenger/messenger
+daphne -b 0.0.0.0 -p 8001 messenger.asgi:application
+----
+apache delete
+----
+service apache2 stop
+apt-get purge apache2 apache2-utils apache2.2-bin apache2-common
+apt-get autoremove
+whereis apache2
+rm -rf ...
+
+NGINX
+====
+server {
+    listen 80;
+    client_max_body_size 20M;
+
+    location /static {
+       	alias /home/misha/code/Messenger/messenger/static;
+
+    }
+
+    location /media {
+        alias /home/misha/code/Messenger/messenger/media;
+
+    }
+
+    location / {
+
+
+       	    proxy_pass http://0.0.0.0:8001;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+
+            proxy_redirect     off;
+            proxy_set_header   Host $host;
+            proxy_set_header   X-Real-IP $remote_addr;
+            proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header   X-Forwarded-Host $server_name;
+
+        }
+
+}
+----
+
+
+supervisor
+----
+vim /etc/supervisor/conf.d/messenger.conf
+[program:messenger]
+command=/home/misha/code/Messenger/bin/start_daphne.sh
+user=misha
+process_name=%(program_name)s
+numprocs=1
+autostart=true
+autorestart=true
+redirect_stderr=true
+----

@@ -1,0 +1,45 @@
+{% extends 'pwaMessenger/main.html' %}
+{% block nav %}
+<li class="nav-item">
+    <a class="nav-link p-0" href="{% url 'accounts:settings' %}">
+        <svg fill="#FFFFFF" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z"/>
+            <path d="M0-.5h24v24H0z" fill="none"/>
+        </svg>
+    </a>
+</li>
+{% endblock nav %}
+{% block title %}{{page_title}}{% endblock title %}
+{% block main %}
+<div class="col-12 p-3">
+    <form method='POST' action="{% url 'accounts:register' %}">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="col-md-4 mb-3 md-form">
+                <label for="loginInput" class="text-dark">Логин</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                {{ form.username.errors }}
+                {% endif %}
+            </div>
+            <div class="col-md-4 mb-3 md-form">
+                <label for="passwordInput" class="text-dark">Пароль</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                {{ form.password.errors }}
+                {% endif %}
+            </div>
+            <div class="col-md-4 mb-3 md-form">
+                <label for="passwordInput" class="text-dark">Пароль ещё раз</label>
+                {{ form.password2 }}
+                {% if form.password.errors %}
+                {{ form.password.errors }}
+                {% endif %}
+            </div>
+        </div>
+        <div class="from-row mt-4">
+            <button class="btn btn-default btn-block btn-sm" type="submit">Создать</button>
+        </div>
+    </form>
+</div>
+{% endblock main %}

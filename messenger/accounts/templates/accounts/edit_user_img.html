@@ -1,0 +1,35 @@
+{% extends 'pwaMessenger/main.html' %}
+{% block title %}{{page_title}}{% endblock title %}
+{% block main %}
+
+<div class="col-12 p-3">
+    <form class="md-form" method='POST' action="{% url 'accounts:edit_user_img' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="file-field">
+            <div class="btn default-color-dark btn-sm float-left">
+                <span class="savemepls"><i class="fas fa-upload mr-2" aria-hidden="true"></i>Выберите фото</span>
+                {{ form.photo }}
+            </div>
+            <div class="file-path-wrapper">
+                <input class="file-path validate text-white" type="text" placeholder="Ваше фото">
+            </div>
+        </div>
+        <div class="form-row mt-4">
+            <button class="btn btn-default btn-block btn-sm" type="submit">Сохранить</button>
+        </div>
+    </form>
+
+</div>
+{% endblock main %}
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('.btn.default-color-dark.btn-sm.float-left.waves-effect.waves-light').children().not('.savemepls').not('#id_photo').remove();
+    })
+    var text = $('.btn.default-color-dark.btn-sm.float-left.waves-effect.waves-light').html();
+    text = text.replace('На данный момент:', '');
+    text = text.replace('Изменить:', '');
+    $('.btn.default-color-dark.btn-sm.float-left.waves-effect.waves-light').html(text);
+</script>
+{% endblock scripts %}

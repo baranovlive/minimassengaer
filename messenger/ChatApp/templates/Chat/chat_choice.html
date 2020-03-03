@@ -1,0 +1,92 @@
+{% extends 'pwaMessenger/main.html' %}
+{% block title %}{{page_title}}{% endblock title %}
+
+
+{% block search %}
+<button class="navbar-toggler toggler-example" type="button" data-toggle="collapse"
+        data-target="#navbarSupportedContent1"
+        aria-controls="navbarSupportedContent1" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="dark-blue-text">
+                <i class="fas fa-bars fa-1x"></i>
+            </span>
+</button>
+<div class="collapse navbar-collapse" id="navbarSupportedContent1">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+            <select class="mdb-select md-form dropdown-default" searchable="Поиск">
+                <option value="" disabled selected>Выберите диалог</option>
+                {% for rnau in room_name_and_user %}
+                {% if rnau.user.first_name != '' and rnau.user.last_name != ''%}
+                <option data-url="{% url 'Chat:room' rnau.room_name %}">
+                    {{ rnau.user.first_name }} {{rnau.user.last_name}} ({{rnau.user}})
+                </option>
+                {% else %}
+                <option data-url="{% url 'Chat:room' rnau.room_name %}">{{rnau.user}}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </li>
+        <li class="nav-item">
+            <label class="mdb-main-label">Выберите диалог</label>
+        </li>
+        {% if request.user.is_superuser %}
+        <li class="nav-item d-flex justify-content-center">
+            <a href="{% url 'Chat:distribution' %}" class="mdb-main-label btn btn-default preloader">Групповая
+                рассылка</a>
+        </li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock search %}
+{% block main %}
+
+<div class="col-12 p-0 pt-1">
+    {% for rnau in room_name_and_user %}
+    <div class="btn-group w-100 dropleft">
+        <a href="{% url 'Chat:room' rnau.room_name %}" class="btn elegant-color w-100 p-2 d-flex align-items-center">
+            <img src="/media/{{ rnau.user.profile.photo  }}" class="user-photo elegant-color-dark rounded float-left"
+                 alt="">
+            <div class="w-100">
+                {% if rnau.user.first_name != '' and rnau.user.last_name != ''%}
+                <p class="text-left h4-responsive text-capitalize ml-2">
+                    {{ rnau.user.first_name }} {{ rnau.user.last_name }}
+                </p>
+                {% else %}
+
+                <p class="text-left h4-responsive text-capitalize ml-2">{{ rnau.user }} </p>
+                {% endif %}
+
+                <div class=" ml-2 text-white-50 align-items-center">
+                    <div><p class="ellipsis text-capitalize">{{ rnau.last_message_content }}</p></div>
+                    <div class="d-flex justify-content-start"><em>{{ rnau.last_message_send_date }}</em></div>
+                </div>
+            </div>
+
+        </a>
+        {% if request.user.is_superuser %}
+        <button type="button" class="btn elegant-color dropdown-toggle px-3" data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+        </button>
+        <div class="dropdown-menu danger-color">
+            <a class="dropdown-item danger-color text-white" href="{% url 'Chat:delete_room' rnau.user %}">Удалить</a>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock main %}
+{% block scripts %}
+<!--  Адаптивный поиск  -->
+<script>
+    //Переход по результату
+    $(".mdb-select").change(function () {
+        let option = $(this).find('option:selected');
+        if (option.data("url")) {
+            window.location.href = option.data("url");
+        }
+    });
+
+
+</script>
+{% endblock scripts %}

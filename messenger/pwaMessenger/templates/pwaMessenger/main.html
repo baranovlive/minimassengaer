@@ -1,0 +1,188 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+
+
+<head>
+    <meta charset="utf-8">
+    <title>Грифон</title>
+    <!--    PWA -->
+    <meta name="generator" content="PWA Starter Kit">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no, minimum-scale=1, maximum-scale=1">
+    <meta name="description" content="Грифон">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <!--
+        The `<base>` tag below is present to support two advanced deployment options:
+        1) Differential serving. 2) Serving from a non-root path.
+
+        Instead of manually editing the `<base>` tag yourself, you should generally either:
+        a) Add a `basePath` property to the build configuration in your `polymer.json`.
+        b) Use the `--base-path` command-line option for `polymer build`.
+      -->
+    <!--    <base href="/">-->
+
+    <link rel="icon" href="{% static 'pwaMessenger/images/favicon.ico' %}">
+
+    <!-- See https://goo.gl/OOhYW5 -->
+    <link rel="manifest" href="{% static 'pwaMessenger/manifest.json' %}">
+
+    <!-- See https://goo.gl/qRE0vM -->
+    <meta name="theme-color" content="#000000">
+
+    <!-- Add to homescreen for Chrome on Android. Fallback for manifest.json -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Грифон">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Грифон">
+
+    <!-- Homescreen icons -->
+    <link rel="apple-touch-icon" href="{% static 'pwaMessenger/images/manifest/icon-48x48.png' %}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{% static 'pwaMessenger/images/manifest/icon-72x72.png' %}">
+    <link rel="apple-touch-icon" sizes="96x96" href="{% static 'pwaMessenger/images/manifest/icon-96x96.png' %}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{% static 'pwaMessenger/images/manifest/icon-144x144.png' %}">
+    <link rel="apple-touch-icon" sizes="192x192" href="{% static 'pwaMessenger/images/manifest/icon-192x192.png' %}">
+
+    <!-- Tile icon for Windows 8 (144x144 + tile color) -->
+    <meta name="msapplication-TileImage" content="{% static 'pwaMessenger/images/manifest/icon-144x144.png' %}">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="msapplication-tap-highlight" content="no">
+
+    <!-- Performance tip: hint to the browser to start the handshake for the fonts site -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <script>
+        // Load and register pre-caching Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register("{% static 'pwaMessenger/service-worker.js' %}", {
+                    scope: '/',
+                });
+            });
+        }
+
+        // Redux assumes `process.env.NODE_ENV` exists in the ES module build.
+        // https://github.com/reactjs/redux/issues/2907
+        window.process = {env: {NODE_ENV: 'production'}};
+    </script>
+    <!--    /PWA -->
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'pwaMessenger/font/css/all.css' %}">
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'pwaMessenger/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="{% static 'pwaMessenger/css/mdb.min.css' %}" rel="stylesheet">
+    <!-- Your custom styles (optional) -->
+    <link href="{% static 'pwaMessenger/css/style.css' %}" rel="stylesheet">
+</head>
+
+<body>
+<div id="mdb-preloader" class="flex-center">
+    <div class="preloader-wrapper active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+                <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block login %}
+<header>
+
+    <nav class="navbar fixed-top navbar-dark elegant-color-dark scrolling-navbar">
+
+        <ul class="navbar-nav nav-flex-icons">
+            {% block nav %}
+            {% endblock nav %}
+            <li class="nav-item d-flex align-items-center">
+                <h1 class="navbar-brand text-center" href="#">
+                    <strong>{% block title %}{{page_title}}{% endblock title%}</strong>
+                </h1>
+            </li>
+
+        </ul>
+        {% block search %}
+
+        {% endblock search %}
+    </nav>
+
+</header>
+<main class="overflow-auto">
+    <div class="container">
+        <div class="row my-5 py-3 text-dark">
+
+            {% block main %}
+
+            {% endblock main %}
+
+        </div>
+    </div>
+</main>
+{% block footer %}
+<footer class="page-footer font-small elegant-color-dark fixed-bottom">
+    <div class="footer-copyright d-flex justify-content-between py-3">
+        <div class="container">
+            <div class="row text-center">
+                <a href="{% url 'accounts:main' %}" class="col h4 mb-0">
+                    <i class="preloader fas fa-address-book {% if page == 1 %}active-menu{% endif %}"></i>
+                </a>
+                <a href="{% url 'Chat:chat_choice' %}" class="col h4 mb-0">
+                    <i class="preloader fas fa-comments {% if page == 2 %}active-menu{% endif %}"></i>
+                </a>
+                <a href="{% url 'accounts:settings' %}" class="col h4 mb-0">
+                    <i class="preloader fas fa-user-cog {% if page == 3 %}active-menu{% endif %}"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+{% endblock footer %}
+{% endblock login %}
+
+
+<script type="text/javascript" src="{% static 'pwaMessenger/js/jquery-3.3.1.min.js' %}"></script>
+<!-- Bootstrap tooltips -->
+<script type="text/javascript" src="{% static 'pwaMessenger/js/popper.min.js' %}"></script>
+<!-- Bootstrap core JavaScript -->
+<script type="text/javascript" src="{% static 'pwaMessenger/js/bootstrap.min.js' %}"></script>
+<!-- MDB core JavaScript -->
+<script type="text/javascript" src="{% static 'pwaMessenger/js/mdb.min.js' %}"></script>
+<!-- Service-worker-->
+<script src="{% static 'pwaMessenger/jquery.ellipsis.min.js' %}"></script>
+<!--<script src="{% static 'pwaMessenger/register-worker.js' %}"></script>-->
+
+<script>
+    // MSelect
+    $(document).ready(function () {
+        $('.mdb-select').materialSelect();
+    });
+
+</script>
+<script>
+    // Preloader
+    $(window).on('load', function () {
+        $('#mdb-preloader').addClass('loaded');
+        window.setTimeout(function () {
+        }, 1200);
+    });
+    $('.preloader').on('click', function () {
+        $('#mdb-preloader').removeClass('loaded');
+        window.setTimeout(function () {
+        }, 1200);
+    });
+</script>
+{% block scripts %}
+
+{% endblock scripts %}
+</body>
+
+</html>

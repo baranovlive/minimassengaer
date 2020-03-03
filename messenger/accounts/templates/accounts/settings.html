@@ -1,0 +1,38 @@
+{% extends 'pwaMessenger/main.html' %}
+{% block title %}{{page_title}}{% endblock title %}
+{% block main %}
+{% if request.user.is_superuser %}
+<div class="col-12 p-0 pt-3">
+    <div class="btn-group w-100 dropleft">
+        <a href="{% url 'accounts:register' %}" class="btn elegant-color w-100 p-2 d-flex align-items-center">
+            <p class="text-left h4-responsive text-capitalize ml-2"><i class="fas fa-user-plus"></i> Создать
+                пользователя</p>
+        </a>
+    </div>
+</div>
+<div class="col-12 p-0 pt-3">
+    <div class="btn-group w-100 dropleft">
+        <a href="{% url 'accounts:user_management' %}" class="btn elegant-color w-100 p-2 d-flex align-items-center">
+            <p class="text-left h4-responsive text-capitalize ml-2"><i class="fas fa-user-minus"></i>
+                Удалить пользователя</p>
+        </a>
+    </div>
+</div>
+{% endif %}
+<div class="col-12 p-0 pt-3">
+    <div class="btn-group w-100 dropleft">
+        <a href="{% url 'accounts:personal_settings' %}" class="btn elegant-color w-100 p-2 d-flex align-items-center">
+            <p class="text-left h4-responsive text-capitalize ml-2"><i class="fas fa-user-cog"></i>
+                Профиль</p>
+        </a>
+    </div>
+</div>
+<div class="col-12 p-0 pt-5">
+    <div class="btn-group w-100 dropleft">
+        <a href="{% url 'accounts:logout' %}" class="btn elegant-color w-100 p-2 d-flex align-items-center">
+            <p class="text-left h4-responsive text-capitalize ml-2"><i class="fas fa-sign-out-alt"></i>
+                Выход</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

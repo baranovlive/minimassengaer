@@ -1,0 +1,170 @@
+{% extends 'pwaMessenger/main.html' %}
+{% block nav %}
+<li class="nav-item">
+    <a class="nav-link p-0" href="{% url 'Chat:chat_choice' %}">
+        <svg fill="#FFFFFF" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z"/>
+            <path d="M0-.5h24v24H0z" fill="none"/>
+        </svg>
+    </a>
+</li>
+{% endblock nav %}
+{% block title %}{{page_title}}{% endblock title %}
+{% block main %}
+<div class="col-12 px-3 pt-1" id="dialog">
+    {% for msg in messages %}
+    {% if msg.author != request.user %}
+    <div class="row">
+        <div class="col-12 question justify-content-start mt-3">
+            <div class="row">
+                <div class="col-10">
+                    <div class="bubble bubble-question">
+                        <span class="text-break">{{msg.content}}<em
+                                class="text-light d-block message-time message-time-start">{{ msg.send_date }}</em></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12 answer justify-content-end mt-3">
+            <div class="row justify-content-end">
+                <div class="col-10 d-flex justify-content-end">
+                    <div class="bubble bubble-answer">
+                        <span class="text-break">{{msg.content}}<em
+                                class="text-light d-block message-time message-time-end">{{ msg.send_date }}</em></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock main %}
+{% block footer %}
+<footer class="page-footer font-small elegant-color-dark fixed-bottom">
+    <!-- Copyright -->
+    <div class="footer-copyright d-flex justify-content-between p-0">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col p-0">
+                    <div class="input-group pl-0">
+                        <input class="form-control form-control-white border-white" type="text"
+                               placeholder="Введите сообщение..."
+                               aria-label="send-msg" id="chat-message-input">
+                        <div class="input-group-append">
+                            <button class="input-group-text elegant-color-dark lighten-1"
+                                    id="chat-message-submit">
+                                <i class="fas fa-paper-plane text-white"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Copyright -->
+
+</footer>
+{% endblock footer %}
+
+{% block scripts %}
+<!-- TODO Сделать вывод новых сообзений-->
+<script>
+    function scrollBot() {
+        document.body.scrollTop = document.body.scrollHeight - document.body.clientHeight;
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+
+    function createDivMessageQuestion(content, date) {
+
+        var div = document.createElement('div');
+        div.innerHTML = '<div class="row"><div class="col-12 question justify-content-start mt-3"><div class="row"><div class="col-10"><div class="bubble bubble-question z-depth-1"><span class="text-break">' + content + '<em class="text-light d-block message-time message-time-start">' + date + '</em></span></div></div></div></div></div>';
+        return div;
+    }
+
+    function createDivMessageAnswer(content, date) {
+        var div = document.createElement('div');
+        div.innerHTML = '<div class="row"><div class="col-12 answer justify-content-end mt-3"><div class="row justify-content-end"><div class="col-10 d-flex justify-content-end"><div class="bubble bubble-answer z-depth-1"><span class="text-break">' + content + '<em class="text-light d-block message-time message-time-end">' + date + '</em></span></div></div></div></div></div>';
+        return div;
+    }
+
+    $(document).ready(function () {
+        scrollBot();
+    })
+    let roomName = {{room_name_json}}
+    let cur_user = {{current_user}}
+    let current_room_name = {{current_room_name}}
+    // let messages = {{ messages }}
+    //создаем сокет
+    let chatSocket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/chat/' + roomName + '/');
+
+
+    // обработка сообщений с бэкенда
+    chatSocket.onmessage = function (e) {
+        let data = JSON.parse(e.data);
+
+        // let still_online = data['still_online'];
+        if (data['message']) {
+            let message = data['message'];
+            let author = data['author'];
+            let date = data['date'];
+            if (author == cur_user) {
+                var msg = createDivMessageAnswer(message, date);
+            } else {
+                var msg = createDivMessageQuestion(message, date);
+            }
+            let main = $('#dialog');
+            main.append(msg);
+            scrollBot();
+
+        }
+    };
+
+    //выхлоп
+    chatSocket.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    // document.querySelector('#chat-message-input').focus();
+    // document.querySelector('#chat-message-input').onkeyup = function (e) {
+    //     if (e.keyCode === 13) {  // enter, return
+    //         document.querySelector('#chat-message-submit').click();
+    //     }
+    // };
+
+    //отправляем на бэкенд сообщение пользователя
+    document.querySelector('#chat-message-submit').onclick = function (e) {
+        let messageInputDom = document.querySelector('#chat-message-input');
+        let message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'author': cur_user,
+            'current_room_name': current_room_name,
+        }));
+
+        messageInputDom.value = '';
+
+
+    };
+
+    function delay() {
+        return new Promise(resolve => setTimeout(resolve, 5000));
+    }
+
+    //Держим сокет открытым
+    async function get_page_alive() {
+        while (true) {
+            await delay();
+            await console.log('PAGE_is_ALIVE');
+        }
+    }
+
+    get_page_alive();
+</script>
+{% endblock scripts %}
